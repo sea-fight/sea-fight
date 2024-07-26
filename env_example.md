@@ -1,5 +1,5 @@
-
 .server-main.env
+
 ```env
 SECRET_KEY=your_secret_key
 ACCESS_TOKEN_EXPIRE_MINUTES=60
@@ -20,9 +20,12 @@ Note that ISDOCKER should be equal to 0 in .env file, that's needed for our `rev
 DB_REMOTE_IP used only for alembic revisions `revision.py`, if DB running on another machine you should provide the same DB_REMOTE_IP and DB_HOST.
 
 .server-mailer.env
+
 ```env
 EMAIL_SENDER_PASSWORD=email_password
 EMAIL_SENDER=uremail@gmail.com
 SMTP_SERVER=smtp.gmail.com
 SMTP_PORT=587
+RABBITMQ_URL=amqp://guest:guest@localhost:5672
+RABBITMQ_QUEUE=mailer
 ```

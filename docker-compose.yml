@@ -1,6 +1,8 @@
 version: '3.8'
 
 services:
+  rabbitmq:
+    image: rabbitmq:alpine
   server_main:
     build:
       context: ./server-main
