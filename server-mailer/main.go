@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 
 	"github.com/sea-fight/sea-fight/server-mailer/amqp"
 )
@@ -17,7 +16,7 @@ type Message struct {
 }
 
 func main() {
-	for delivery := range amqp.ListenForEvents(os.Getenv("RABBITMQ_URL"), os.Getenv("RABBITMQ_QUEUE")) {
+	for delivery := range amqp.ListenForEvents() {
 		msg := new(Message)
 		if err := json.Unmarshal(delivery.Body, msg); err != nil {
 			fmt.Println("Invalid message:", string(delivery.Body))
