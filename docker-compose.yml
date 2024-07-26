@@ -6,10 +6,5 @@ services:
       context: ./server-main
     ports:
       - "8000:8000"
-    networks:
-      - monorepo-network
     env_file:
-      - .server_main.env
-      - .email.env
-networks:
-  monorepo-network:
+      - .server-main.env
