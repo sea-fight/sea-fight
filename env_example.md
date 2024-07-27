@@ -26,11 +26,7 @@ EMAIL_SENDER_PASSWORD=email_password
 EMAIL_SENDER=uremail@gmail.com
 SMTP_SERVER=smtp.gmail.com
 SMTP_PORT=587
+RABBITMQ_URL=amqp://guest:guest@localhost:5672
 RABBITMQ_QUEUE=mailer
 TEMPLATES_DIR=./templates
-```
-
-.globals.env
-```
-RABBITMQ_URL=amqp://guest:guest@localhost:5672
 ```
