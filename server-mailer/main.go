@@ -47,7 +47,7 @@ func main() {
 			log.Warn("Requested invalid template: " + msg.Template)
 			continue
 		}
-		text, ok := template.Format(msg.Args)
+		subject, text, ok := template.Format(msg.Args)
 		if !ok {
 			keys := make([]string, len(msg.Args))
 			for k := range msg.Args {
@@ -66,7 +66,7 @@ func main() {
 		mail := gomail.NewMessage()
 		mail.SetHeader("From", config.EmailSender)
 		mail.SetHeader("To", msg.Receiver)
-		mail.SetHeader("Subject", template.Subject())
+		mail.SetHeader("Subject", subject)
 		mail.SetBody("text/plain", text)
 		err := gomail.Send(sender, mail)
 		if err != nil {

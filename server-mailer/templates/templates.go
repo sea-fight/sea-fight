@@ -16,31 +16,31 @@ type Template struct {
 	text    string
 }
 
-func (t *Template) Format(other map[string]string) (string, bool) {
+func (t *Template) Format(other map[string]string) (string, string, bool) {
 	if len(t.args) != len(other) {
-		return "", false
+		return "", "", false
 	}
 	for _, val := range t.args {
 		_, ok := other[val]
 		if !ok {
-			return "", false
+			return "", "", false
 		}
+	}
+	subject := t.subject
+	for k, v := range other {
+		subject = strings.ReplaceAll(subject, "{"+k+"}", v)
 	}
 	text := t.text
 	for k, v := range other {
 		text = strings.ReplaceAll(text, "{"+k+"}", v)
 	}
-	return text, true
+	return subject, text, true
 }
 
 func (t *Template) Args() []string {
 	r := make([]string, len(t.args))
 	copy(r, t.args)
 	return r
-}
-
-func (t *Template) Subject() string {
-	return t.subject
 }
 
 func New(log *zap.Logger) map[string]*Template {
