@@ -1,2 +1,2 @@
-.email.env
-.server_main.env
+.server-main.env
+.server-mailer.env

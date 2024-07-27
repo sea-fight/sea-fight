@@ -1,14 +1,13 @@
 package config
 
 import (
-	"fmt"
 	"os"
 )
 
 func env(key string) string {
 	val := os.Getenv(key)
 	if val == "" {
-		panic(fmt.Sprint("Environment variable", key, "not set"))
+		panic("Environment variable " + key + " not set")
 	}
 	return val
 }

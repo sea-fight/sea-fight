@@ -3,11 +3,12 @@ module github.com/sea-fight/sea-fight/server-mailer
 go 1.22.5
 
 require (
-	github.com/emersion/go-sasl v0.0.0-20200509203442-7bfe0ed36a21 // indirect
-	github.com/emersion/go-smtp v0.21.3 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
-	github.com/rabbitmq/amqp091-go v1.10.0 // indirect
-	golang.org/x/text v0.3.7 // indirect
-	gopkg.in/ini.v1 v1.64.0 // indirect
-	unknwon.dev/i18n v1.0.1 // indirect
+	github.com/rabbitmq/amqp091-go v1.10.0
+	go.uber.org/zap v1.27.0
+	gopkg.in/mail.v2 v2.3.1
+)
+
+require (
+	go.uber.org/multierr v1.11.0 // indirect
+	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 )

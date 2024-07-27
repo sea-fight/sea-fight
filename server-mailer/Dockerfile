@@ -1,19 +1,24 @@
-FROM golang:latest
+FROM ubuntu as base
+
+RUN apt update
+RUN apt install -y ca-certificates
+
+FROM golang as app
 
 ENV GOPROXY="https://goproxy.io,direct"
 
 WORKDIR /app
 
-COPY . .
+COPY go.mod go.sum ./
 
 RUN go mod download
 
+COPY . .
+
 RUN go build -o app .
 
-FROM busybox
+FROM base
 
-WORKDIR /app
+COPY --from=app /app/app .
 
-COPY --from=0 ./app ./app
-
-CMD [ "./app" ]
+CMD [ "/app" ]

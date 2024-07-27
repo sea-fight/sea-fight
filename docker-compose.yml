@@ -1,8 +1,8 @@
-version: '3.8'
-
 services:
   rabbitmq:
     image: rabbitmq:alpine
+    ports:
+      - '15672:15672'
   server-main:
     build:
       context: ./server-main
@@ -16,4 +16,9 @@ services:
     depends_on:
       - rabbitmq
     env_file:
-      - server-mailer.env
+      - .server-mailer.env
+    volumes:
+      - ./email-templates:/email-templates:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
