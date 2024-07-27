@@ -26,7 +26,11 @@ func main() {
 	templates := templates.New(log)
 	log.Info(fmt.Sprint(len(templates), " templates successfully parsed"))
 	log.Info("Connecting to SMTP...")
-	smtp := connectToSMTP()
+	smtp := newDialer()
+	sender, err := smtp.Dial()
+	if err != nil {
+		panic(fmt.Sprint("Cannot connect to SMTP: ", err))
+	}
 	log.Info("SMTP connected")
 	log.Info("Connecting to AMQP...")
 	deliveries := listenForEvents()
@@ -64,7 +68,7 @@ func main() {
 		mail.SetHeader("To", msg.Receiver)
 		mail.SetHeader("Subject", template.Subject())
 		mail.SetBody("text/plain", text)
-		err := smtp.DialAndSend(mail)
+		err := gomail.Send(sender, mail)
 		if err != nil {
 			log.Error("Cannot send mail", zap.Error(err))
 		}
@@ -91,7 +95,7 @@ func listenForEvents() <-chan amqp091.Delivery {
 	return deliveries
 }
 
-func connectToSMTP() *gomail.Dialer {
+func newDialer() *gomail.Dialer {
 	port, _ := strconv.Atoi(config.SmtpPort)
 	dialer := gomail.NewDialer(config.SmtpServer, port, config.EmailSender, config.EmailSenderPassword)
 	dialer.TLSConfig = &tls.Config{ServerName: config.SmtpServer}

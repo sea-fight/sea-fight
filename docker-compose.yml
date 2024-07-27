@@ -6,6 +6,7 @@ services:
   server-main:
     build:
       context: ./server-main
+    restart: always
     ports:
       - "8000:8000"
     env_file:
@@ -13,6 +14,7 @@ services:
   server-mailer:
     build:
       context: ./server-mailer
+    restart: always
     depends_on:
       - rabbitmq
     env_file:
