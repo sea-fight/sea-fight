@@ -1,9 +1,4 @@
-FROM ubuntu as base
-
-RUN apt update
-RUN apt install -y ca-certificates
-
-FROM golang as app
+FROM golang:alpine as app
 
 ENV GOPROXY="https://goproxy.io,direct"
 
@@ -17,7 +12,7 @@ COPY . .
 
 RUN go build -o app .
 
-FROM base
+FROM alpine
 
 COPY --from=app /app/app .
 
