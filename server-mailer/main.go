@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
-	"strings"
 
 	"github.com/rabbitmq/amqp091-go"
 	"github.com/sea-fight/sea-fight/server-mailer/config"
@@ -39,28 +38,17 @@ func main() {
 		log.Info("Received message")
 		msg := new(Message)
 		if json.Unmarshal(delivery.Body, msg) != nil {
-			log.Warn("Invalid message: " + string(delivery.Body))
+			log.Warn("Invalid message structure", zap.String("body", string(delivery.Body)))
 			continue
 		}
 		template, ok := templates[msg.Template]
 		if !ok {
-			log.Warn("Requested invalid template: " + msg.Template)
+			log.Warn("Requested template that does not exist", zap.String("name", msg.Template))
 			continue
 		}
-		subject, text, ok := template.Format(msg.Args)
-		if !ok {
-			keys := make([]string, len(msg.Args))
-			for k := range msg.Args {
-				keys = append(keys, k)
-			}
-			log.Warn(fmt.Sprint(
-				"Requested template ",
-				msg.Template,
-				" with invalid args: ",
-				strings.Join(keys, ","),
-				" expected ",
-				strings.Join(template.Args(), ","),
-			))
+		subject, text, err := template.Format(msg.Args)
+		if err != nil {
+			log.Warn("Failed to format template", zap.Error(err))
 			continue
 		}
 		mail := gomail.NewMessage()
@@ -68,7 +56,7 @@ func main() {
 		mail.SetHeader("To", msg.Receiver)
 		mail.SetHeader("Subject", subject)
 		mail.SetBody("text/plain", text)
-		err := gomail.Send(sender, mail)
+		err = gomail.Send(sender, mail)
 		if err != nil {
 			log.Error("Cannot send mail", zap.Error(err))
 		}
