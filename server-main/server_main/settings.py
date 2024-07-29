@@ -24,10 +24,8 @@ class Settings(BaseSettings):
     redis_port: int = int(required_env("REDIS_PORT"))
     redis_password: str = required_env("REDIS_PASSWORD")
 
-    email_sender_password: str = required_env("EMAIL_SENDER_PASSWORD")
-    email_sender: str = required_env("EMAIL_SENDER")
-    smtp_server: str = required_env("SMTP_SERVER")
-    smtp_port: int = int(required_env("SMTP_PORT"))
+    rabbitmq_url: str = required_env("RABBITMQ_URL")
+    rabbitmq_mailer_queue: str = required_env("RABBITMQ_MAILER_QUEUE")
 
     username_max_length: int = 32
     username_min_length: int = 4
@@ -38,6 +36,7 @@ class Settings(BaseSettings):
 
     email_code_length: int = 8
     email_code_expiretime: int = 3600  # in seconds
+    email_code_request_attempts_limit: int = 3
 
     @property
     def db_url(self) -> URL:
