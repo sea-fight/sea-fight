@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"slices"
 	"strconv"
 
 	"github.com/rabbitmq/amqp091-go"
@@ -45,6 +46,12 @@ func main() {
 		if !ok {
 			log.Warn("Requested template that does not exist", zap.String("name", msg.Template))
 			continue
+		}
+		if slices.Contains(template.Args(), "email") {
+			_, ok := msg.Args["email"]
+			if !ok {
+				msg.Args["email"] = msg.Receiver
+			}
 		}
 		subject, text, err := template.Format(msg.Args)
 		if err != nil {
