@@ -3,12 +3,12 @@ services:
     image: rabbitmq:alpine
     ports:
       - '15672:15672'
-  server-main:
-    build:
-      context: ./server-main
-    restart: always
-    ports:
-      - "8000:8000"
+  # server-main:
+  #   build:
+  #     context: ./server-main
+  #   restart: always
+  #   ports:
+  #     - "8000:8000"
     env_file:
       - .server-main.env
   server-mailer:
@@ -24,3 +24,46 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
+  server-main:
+    build:
+      context: ./server-main
+    command: ["uvicorn", "server_main.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    # volumes:
+    #   - .:/server-main
+    ports:
+      - "8000:8000"
+    env_file:
+      - .server-main.env
+    environment:
+      ISDOCKER: 1
+    depends_on:
+      - db
+      - redis
+
+  db:
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - .server-main.env
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:6-alpine
+    ports:
+      - "6379:6379"
+    env_file:
+      - .server-main.env
+    command:
+      - /bin/sh
+      - -c
+      # - Double dollars, so that the variable is not expanded by Docker Compose
+      # - Surround by quotes, so that the shell does not split the password
+      # - The ${variable:?message} syntax causes shell to exit with a non-zero
+      #   code and print a message, when the variable is not set or empty
+      - redis-server --requirepass "$${REDIS_PASSWORD:?REDIS_PASSWORD variable is not set}"
+
+
+volumes:
+  postgres_data:
