@@ -3,6 +3,7 @@ package templates
 import (
 	"errors"
 	"fmt"
+	"maps"
 	"os"
 	"path"
 	"regexp"
@@ -56,22 +57,29 @@ func New(log *zap.Logger) map[string]*Template {
 		panic(fmt.Sprint("Cannot read templates directory: ", err))
 	}
 	for _, entry := range entries {
+		templateName := entry.Name()[:strings.IndexByte(entry.Name(), '.')]
 		fullPath := path.Join(config.TemplatesDir, entry.Name())
 		bytes, err := os.ReadFile(fullPath)
 		if err != nil {
 			panic(fmt.Sprint("Cannot read file: ", err))
 		}
-		text := string(bytes)
+		argsDef, text, _ := strings.Cut(string(bytes), "\n\n")
+		argsDefMap := make(map[string]bool)
+		for _, v := range strings.Split(argsDef, ",") {
+			argsDefMap[v] = true
+		}
 		matches := re.FindAllStringSubmatch(text, -1)
 		argsMap := make(map[string]bool)
 		for _, val := range matches {
 			argsMap[val[1]] = true
 		}
+		if !maps.Equal(argsDefMap, argsMap) {
+			panic("Args in " + templateName + " template definition and its content does not match")
+		}
 		args := make([]string, 0, len(argsMap))
 		for k := range argsMap {
 			args = append(args, k)
 		}
-		templateName := entry.Name()[:strings.IndexByte(entry.Name(), '.')]
 		log.Info("Registered template " + templateName)
 		result[templateName] = &Template{
 			args: args,

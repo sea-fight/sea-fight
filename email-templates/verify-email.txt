@@ -1,3 +1,5 @@
+receiver,code
+
 Verify your email in Sea Fight
 
 Hello, {receiver}. To verify your email, enter the code {code} on site.
