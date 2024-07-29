@@ -47,10 +47,10 @@ func main() {
 			log.Warn("Requested template that does not exist", zap.String("name", msg.Template))
 			continue
 		}
-		if slices.Contains(template.Args(), "email") {
-			_, ok := msg.Args["email"]
+		if slices.Contains(template.Args(), "receiver") {
+			_, ok := msg.Args["receiver"]
 			if !ok {
-				msg.Args["email"] = msg.Receiver
+				msg.Args["receiver"] = msg.Receiver
 			}
 		}
 		subject, text, err := template.Format(msg.Args)

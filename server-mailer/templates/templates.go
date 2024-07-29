@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"regexp"
 	"strings"
 
 	"github.com/sea-fight/sea-fight/server-mailer/config"
@@ -46,6 +47,8 @@ func (t *Template) Args() []string {
 	return r
 }
 
+var re = regexp.MustCompile(`\{([a-z]+)\}`)
+
 func New(log *zap.Logger) map[string]*Template {
 	result := make(map[string]*Template)
 	entries, err := os.ReadDir(config.TemplatesDir)
@@ -58,14 +61,20 @@ func New(log *zap.Logger) map[string]*Template {
 		if err != nil {
 			panic(fmt.Sprint("Cannot read file: ", err))
 		}
-		templateName := entry.Name()[:strings.IndexByte(entry.Name(), '.')]
-		args, text, ok := strings.Cut(string(bytes), "\n\n")
-		if !ok {
-			panic("Template " + templateName + " is malformed")
+		text := string(bytes)
+		matches := re.FindAllStringSubmatch(text, -1)
+		argsMap := make(map[string]bool)
+		for _, val := range matches {
+			argsMap[val[1]] = true
 		}
+		args := make([]string, 0, len(argsMap))
+		for k := range argsMap {
+			args = append(args, k)
+		}
+		templateName := entry.Name()[:strings.IndexByte(entry.Name(), '.')]
 		log.Info("Registered template " + templateName)
 		result[templateName] = &Template{
-			args: strings.Split(args, ","),
+			args: args,
 			text: text,
 		}
 	}
