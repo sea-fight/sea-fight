@@ -3,27 +3,27 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/rabbitmq/amqp091-go"
 	"github.com/sea-fight/sea-fight/server-mailer/config"
+	"github.com/sea-fight/sea-fight/server-mailer/events/immediatemail"
 	"github.com/sea-fight/sea-fight/server-mailer/mail"
 	"github.com/sea-fight/sea-fight/server-mailer/templates"
 	"go.uber.org/zap"
 )
 
-type Message struct {
-	Receiver string            `json:"receiver"`
-	Template string            `json:"template"`
-	Args     map[string]string `json:"args"`
+type AnyMessage struct {
+	Kind string `json:"kind"`
 }
 
 func main() {
 	log, _ := zap.NewDevelopment()
-	log.Info("Parsing templates...")
+	log.Info("Registering templates...")
 	tmp, err := templates.Parse(log)
 	if err != nil {
 		log.Fatal("Cannot parse templates", zap.Error(err))
 	}
-	log.Info(fmt.Sprint(tmp.Count(), " templates successfully parsed"))
+	log.Info(fmt.Sprint(tmp.Count(), " templates registered"))
 	log.Info("Connecting to SMTP...")
 	mailer, err := mail.ConnectEnv()
 	if err != nil {
@@ -38,26 +38,36 @@ func main() {
 	log.Info("AMQP connected, listening for events")
 	for delivery := range deliveries {
 		log.Info("Received message")
-		msg := new(Message)
-		if json.Unmarshal(delivery.Body, msg) != nil {
+		anyMsg := new(AnyMessage)
+		if json.Unmarshal(delivery.Body, anyMsg) != nil {
 			log.Warn("Invalid message structure", zap.String("body", string(delivery.Body)))
 			continue
 		}
-		templateContext, ok := tmp.BeginContext(msg.Template)
-		if !ok {
-			log.Warn("Requested template that does not exist", zap.String("name", msg.Template))
-			continue
-		}
-		templateContext.With("receiver", msg.Args["receiver"])
-		templateContext.WithMany(msg.Args)
-		subject, text, err := templateContext.Render()
-		if err != nil {
-			log.Warn("Failed to format template", zap.Error(err))
-			continue
-		}
-		err = mailer.SendMail(msg.Receiver, subject, text)
-		if err != nil {
-			panic(err)
+		switch anyMsg.Kind {
+		case immediatemail.Key:
+			msg := new(immediatemail.Message)
+			if json.Unmarshal(delivery.Body, msg) != nil {
+				log.Warn("Invalid message structure", zap.String("body", string(delivery.Body)))
+				continue
+			}
+			templateContext, ok := tmp.CreateContext(msg.Template)
+			if !ok {
+				log.Warn("Requested template that does not exist", zap.String("name", msg.Template))
+				continue
+			}
+			templateContext.With("receiver", msg.Receiver)
+			templateContext.WithMany(msg.Args)
+			subject, text, err := templateContext.Render()
+			if err != nil {
+				log.Warn("Failed to format template", zap.Error(err))
+				continue
+			}
+			err = mailer.SendMail(msg.Receiver, subject, text)
+			if err != nil {
+				log.Error("Failed to send mail", zap.Error(err))
+			}
+		default:
+			log.Warn("Unknown message kind", zap.String("kind", anyMsg.Kind))
 		}
 	}
 }

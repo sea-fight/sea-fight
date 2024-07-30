@@ -99,7 +99,7 @@ func (t *Templates) Count() int {
 	return len(t.inner)
 }
 
-func (t *Templates) BeginContext(templateName string) (*TemplateContext, bool) {
+func (t *Templates) CreateContext(templateName string) (*TemplateContext, bool) {
 	tmp, ok := t.inner[templateName]
 	if !ok {
 		return nil, false
@@ -117,9 +117,7 @@ func (t *TemplateContext) With(key, value string) {
 }
 
 func (t *TemplateContext) WithMany(kv map[string]string) {
-	for k, v := range kv {
-		t.args[k] = v
-	}
+	maps.Copy(t.args, kv)
 }
 
 func (t *TemplateContext) Render() (string, string, error) {
