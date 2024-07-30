@@ -18,18 +18,26 @@ type Template struct {
 	text string
 }
 
-var ErrInvalidArgs = errors.New("invalid arguments")
-var ErrMalformedTemplate = errors.New("malformed template")
+type missingArgsError struct {
+	Args []string
+}
 
-func (t *Template) Format(other map[string]string) (string, string, error) {
-	if len(t.args) != len(other) {
-		return "", "", ErrInvalidArgs
-	}
+func (e *missingArgsError) Error() string {
+	return fmt.Sprint("missing args: ", strings.Join(e.Args, ", "))
+}
+
+var ErrTemplateMalformed = errors.New("template malformed after processing")
+
+func (t *Template) fmt(other map[string]string) (subject string, body string, err error) {
+	missingArgs := make([]string, 0)
 	for _, val := range t.args {
 		_, ok := other[val]
 		if !ok {
-			return "", "", ErrInvalidArgs
+			missingArgs = append(missingArgs, val)
 		}
+	}
+	if len(missingArgs) > 0 {
+		return "", "", &missingArgsError{missingArgs}
 	}
 	text := t.text
 	for _, val := range t.args {
@@ -37,31 +45,25 @@ func (t *Template) Format(other map[string]string) (string, string, error) {
 	}
 	subject, body, ok := strings.Cut(text, "\n\n")
 	if !ok {
-		return "", "", ErrMalformedTemplate
+		return "", "", ErrTemplateMalformed
 	}
 	return subject, body, nil
 }
 
-func (t *Template) Args() []string {
-	r := make([]string, len(t.args))
-	copy(r, t.args)
-	return r
-}
+var re = regexp.MustCompile(`\{([a-z]+)}`)
 
-var re = regexp.MustCompile(`\{([a-z]+)\}`)
-
-func New(log *zap.Logger) map[string]*Template {
+func Parse(log *zap.Logger) (*Templates, error) {
 	result := make(map[string]*Template)
 	entries, err := os.ReadDir(config.TemplatesDir)
 	if err != nil {
-		panic(fmt.Sprint("Cannot read templates directory: ", err))
+		return nil, fmt.Errorf("cannot read templates directory: %w", err)
 	}
 	for _, entry := range entries {
 		templateName := entry.Name()[:strings.IndexByte(entry.Name(), '.')]
 		fullPath := path.Join(config.TemplatesDir, entry.Name())
 		bytes, err := os.ReadFile(fullPath)
 		if err != nil {
-			panic(fmt.Sprint("Cannot read file: ", err))
+			return nil, fmt.Errorf("cannot read file: %w", err)
 		}
 		argsDef, text, _ := strings.Cut(string(bytes), "\n\n")
 		argsDefMap := make(map[string]bool)
@@ -74,7 +76,7 @@ func New(log *zap.Logger) map[string]*Template {
 			argsMap[val[1]] = true
 		}
 		if !maps.Equal(argsDefMap, argsMap) {
-			panic("Args in " + templateName + " template definition and its content does not match")
+			return nil, fmt.Errorf("args in %s template definition and its content does not match", templateName)
 		}
 		args := make([]string, 0, len(argsMap))
 		for k := range argsMap {
@@ -86,5 +88,40 @@ func New(log *zap.Logger) map[string]*Template {
 			text: text,
 		}
 	}
-	return result
+	return &Templates{result}, nil
+}
+
+type Templates struct {
+	inner map[string]*Template
+}
+
+func (t *Templates) Count() int {
+	return len(t.inner)
+}
+
+func (t *Templates) BeginContext(templateName string) (*TemplateContext, bool) {
+	tmp, ok := t.inner[templateName]
+	if !ok {
+		return nil, false
+	}
+	return &TemplateContext{tmp, make(map[string]string)}, true
+}
+
+type TemplateContext struct {
+	tmp  *Template
+	args map[string]string
+}
+
+func (t *TemplateContext) With(key, value string) {
+	t.args[key] = value
+}
+
+func (t *TemplateContext) WithMany(kv map[string]string) {
+	for k, v := range kv {
+		t.args[k] = v
+	}
+}
+
+func (t *TemplateContext) Render() (string, string, error) {
+	return t.tmp.fmt(t.args)
 }

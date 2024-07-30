@@ -22,8 +22,9 @@ DB_REMOTE_IP used only for alembic revisions `revision.py`, if DB running on ano
 .server-mailer.env
 
 ```env
-EMAIL_SENDER_PASSWORD=email_password
-EMAIL_SENDER=uremail@gmail.com
+EMAIL_USERNAME=uremail@gmail.com
+EMAIL_PASSWORD=email_password
+EMAIL_ADDRESS=uremail@gmail.com
 SMTP_SERVER=smtp.gmail.com
 SMTP_PORT=587
 RABBITMQ_URL=amqp://guest:guest@localhost:15672

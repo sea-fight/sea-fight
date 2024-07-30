@@ -2,6 +2,7 @@ package config
 
 import (
 	"os"
+	"strconv"
 )
 
 func env(key string) string {
@@ -12,10 +13,21 @@ func env(key string) string {
 	return val
 }
 
-var EmailSender = env("EMAIL_SENDER")
-var EmailSenderPassword = env("EMAIL_SENDER_PASSWORD")
+func envInt(key string) int {
+	v := env(key)
+	i, err := strconv.Atoi(v)
+	if err != nil {
+		panic(err)
+	}
+	return i
+}
+
+var EmailUsername = env("EMAIL_USERNAME")
+var EmailPassword = env("EMAIL_PASSWORD")
+var EmailAddress = env("EMAIL_ADDRESS")
 var SmtpServer = env("SMTP_SERVER")
-var SmtpPort = env("SMTP_PORT")
+var SmtpPort = envInt("SMTP_PORT")
+
 var RabbitmqUrl = env("RABBITMQ_URL")
 var RabbitmqQueue = env("RABBITMQ_QUEUE")
 var TemplatesDir = env("TEMPLATES_DIR")
