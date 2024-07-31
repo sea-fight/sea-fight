@@ -1,4 +1,4 @@
-module github.com/sea-fight/sea-fight/server-mailer
+module github.com/sea-fight/sea-fight/server-notifications
 
 go 1.22.5
 

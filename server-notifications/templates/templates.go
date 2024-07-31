@@ -9,7 +9,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/sea-fight/sea-fight/server-mailer/config"
+	"github.com/sea-fight/sea-fight/server-notifications/config"
 	"go.uber.org/zap"
 )
 

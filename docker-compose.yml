@@ -11,14 +11,14 @@ services:
   #     - "8000:8000"
     env_file:
       - .server-main.env
-  server-mailer:
+  server-notifications:
     build:
-      context: ./server-mailer
+      context: ./server-notifications
     restart: always
     depends_on:
       - rabbitmq
     env_file:
-      - .server-mailer.env
+      - .server-notifications.env
     volumes:
       - ./email-templates:/email-templates:ro
     extra_hosts:

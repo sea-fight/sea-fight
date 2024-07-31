@@ -1,7 +1,7 @@
 package mail
 
 import (
-	"github.com/sea-fight/sea-fight/server-mailer/config"
+	"github.com/sea-fight/sea-fight/server-notifications/config"
 	gomail "gopkg.in/mail.v2"
 )
 
