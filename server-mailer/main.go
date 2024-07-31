@@ -5,10 +5,10 @@ import (
 	"fmt"
 
 	"github.com/rabbitmq/amqp091-go"
-	"github.com/sea-fight/sea-fight/server-notifications/config"
-	"github.com/sea-fight/sea-fight/server-notifications/events/immediatemail"
-	"github.com/sea-fight/sea-fight/server-notifications/mail"
-	"github.com/sea-fight/sea-fight/server-notifications/templates"
+	"github.com/sea-fight/sea-fight/server-mailer/config"
+	"github.com/sea-fight/sea-fight/server-mailer/events/immediatemail"
+	"github.com/sea-fight/sea-fight/server-mailer/mail"
+	"github.com/sea-fight/sea-fight/server-mailer/templates"
 	"go.uber.org/zap"
 )
 
