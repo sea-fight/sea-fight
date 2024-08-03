@@ -2,12 +2,17 @@ import os
 
 
 def required_env_many(*env_variables: str) -> list[str]:
-    """Function for safely retrieving environment variables.
+    """
+    Retrieve multiple environment variables safely.
 
-    :param env_variables: The names of the constants whose value you want to get.
-    :return: A collection of values of the constants in .env.
-        The order of return is the same as the order in which arguments are transmitted.
-    :raises EnvironmentError: If constant name not found in .env file.
+    Args:
+        env_variables (str): Names of the environment variables to retrieve.
+
+    Returns:
+        list[str]: Values of the requested environment variables in the same order as the arguments.
+
+    Raises:
+        EnvironmentError: If any of the specified environment variables are not found.
     """
     values: list[str] = []
     not_found_env_variables: list[str] = []
@@ -20,7 +25,7 @@ def required_env_many(*env_variables: str) -> list[str]:
 
     if not_found_env_variables:
         raise EnvironmentError(
-            "Please set up .env file with following constants: "
+            "Please set up .env file with the following constants: "
             + " ".join(not_found_env_variables),
         )
 
@@ -28,4 +33,16 @@ def required_env_many(*env_variables: str) -> list[str]:
 
 
 def required_env(env_variable: str) -> str:
+    """
+    Retrieve a single environment variable safely.
+
+    Args:
+        env_variable (str): Name of the environment variable to retrieve.
+
+    Returns:
+        str: Value of the requested environment variable.
+
+    Raises:
+        EnvironmentError: If the specified environment variable is not found.
+    """
     return required_env_many(env_variable)[0]
