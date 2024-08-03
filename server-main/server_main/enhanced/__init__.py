@@ -6,15 +6,11 @@ Classes:
     AppCtx (BaseModel): Represents the application context holding various integrations.
     EnhancedApp (FastAPI): An enhanced FastAPI application with an application context.
     EnhancedRequest (Request): An enhanced request class with a custom application property.
-
-Usage example:
-    ```python
-    def get_mailer(request: EnhancedRequest) -> Mailer:
-        return request.app.ctx.mailer
-    ```
+    EnhancedHTTPException (HTTPException): An enhanced exception class that include additional attributes for error handling.
 """
 
 from .app import EnhancedApp, AppCtx
 from .request import EnhancedRequest
+from .exception import EnhancedHTTPException
 
-__all__ = ["EnhancedApp", "AppCtx", "EnhancedRequest"]
+__all__ = ["EnhancedApp", "AppCtx", "EnhancedRequest", "EnhancedHTTPException"]

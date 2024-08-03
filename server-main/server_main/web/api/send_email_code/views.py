@@ -9,7 +9,7 @@ from server_main.web.schemas.send_email_code import (
     SendEmailCodeRequestSchema,
     SendEmailCodeResponseSchema,
 )
-from server_main.web.schemas.error_response import EnhancedHTTPException
+from server_main.enhanced import EnhancedHTTPException
 from server_main.handlers.send_email_code import send_email_code_handler
 from server_main.dependencies import (
     get_mailer,

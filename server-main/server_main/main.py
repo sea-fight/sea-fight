@@ -6,10 +6,9 @@ from .web.api import router
 from .web.integrations.redis import RedisManager
 from .web.integrations.rabbitmq import RabbitMQManager
 from .web.integrations.services import Mailer
-from .web.schemas.error_response import EnhancedHTTPException, ErrorResponseSchema
 from .db.base import db_session
 from .settings import settings
-from .enhanced import AppCtx, EnhancedApp
+from .enhanced import AppCtx, EnhancedApp, EnhancedHTTPException
 
 
 @asynccontextmanager
@@ -36,15 +35,5 @@ app.include_router(router)
 async def enhanced_exception_handler(request: Request, exc: EnhancedHTTPException):
     return JSONResponse(
         status_code=exc.status_code,
-        content=ErrorResponseSchema(ok=0, code=exc.code, info=exc.info).model_dump(),
+        content={"ok": 0, "code": exc.code, "info": exc.info},
     )
-
-
-async def get_rabbitmq_connection(
-    request: Request,
-) -> aio_pika.abc.AbstractRobustConnection:
-    return request.app.app_ctx.rabbitmq_connection
-
-
-async def get_rabbitmq_channel(request: Request) -> aio_pika.abc.AbstractChannel:
-    return request.app.state.rabbitmq_channel
