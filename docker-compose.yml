@@ -3,6 +3,7 @@ services:
     image: rabbitmq:alpine
     ports:
       - '15672:15672'
+      - '5672:5672'
   # server-main:
   #   build:
   #     context: ./server-main
@@ -36,9 +37,11 @@ services:
       - .server-main.env
     environment:
       ISDOCKER: 1
+    restart: always
     depends_on:
       - db
       - redis
+      - server-mailer
 
   db:
     image: postgres:13

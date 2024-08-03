@@ -1,11 +1,11 @@
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from server_main.db.repositories.user import UserRepository
-from server_main.db.dependencies import get_db_session
 from server_main.web.schemas.sign_up import (
     SignUpRequestSchema,
     SignUpResponseSchema,
 )
+from server_main.dependencies import get_db_session
 from server_main.handlers.sign_up import sign_up_handler
 from .router import router
 

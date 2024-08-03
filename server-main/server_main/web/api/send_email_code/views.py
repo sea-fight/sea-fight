@@ -1,19 +1,21 @@
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from redis.asyncio import Redis
-from aio_pika.abc import AbstractRobustConnection
-from server_main.db.dependencies import get_db_session
 from server_main.web.integrations.redis import (
     RedisDB,
-    get_redis_connection,
 )
-from server_main.web.integrations.rabbitmq import get_rabbitmq_connection
+from server_main.web.integrations.services import Mailer
 from server_main.web.schemas.send_email_code import (
     SendEmailCodeRequestSchema,
     SendEmailCodeResponseSchema,
 )
 from server_main.web.schemas.error_response import EnhancedHTTPException
 from server_main.handlers.send_email_code import send_email_code_handler
+from server_main.dependencies import (
+    get_mailer,
+    get_redis_connection,
+    get_db_session,
+)
 from .router import router
 
 
@@ -22,11 +24,9 @@ async def send_email_code(
     request_data: SendEmailCodeRequestSchema,
     db: AsyncSession = Depends(get_db_session),
     redis_connection: Redis = Depends(get_redis_connection(RedisDB.EMAIL_CODE_VERIFY)),
-    rabbitmq_connection: AbstractRobustConnection = Depends(get_rabbitmq_connection),
+    mailer: Mailer = Depends(get_mailer),
 ) -> SendEmailCodeResponseSchema:
-    if await send_email_code_handler(
-        redis_connection, rabbitmq_connection, request_data
-    ):
+    if await send_email_code_handler(redis_connection, mailer, request_data):
         return SendEmailCodeResponseSchema(ok=1)
     raise EnhancedHTTPException(
         403,

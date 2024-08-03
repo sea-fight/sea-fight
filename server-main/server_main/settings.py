@@ -36,7 +36,7 @@ class Settings(BaseSettings):
 
     email_code_length: int = 8
     email_code_expiretime: int = 3600  # in seconds
-    email_code_request_attempts_limit: int = 3
+    email_code_request_attempts_limit: int = 69
 
     @property
     def db_url(self) -> URL:
