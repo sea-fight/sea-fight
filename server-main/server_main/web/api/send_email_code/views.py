@@ -14,7 +14,6 @@ from server_main.handlers.send_email_code import send_email_code_handler
 from server_main.dependencies import (
     get_mailer,
     get_redis_connection,
-    get_db_session,
 )
 from .router import router
 
@@ -22,7 +21,6 @@ from .router import router
 @router.post("/send-email-code")
 async def send_email_code(
     request_data: SendEmailCodeRequestSchema,
-    db: AsyncSession = Depends(get_db_session),
     redis_connection: Redis = Depends(get_redis_connection(RedisDB.EMAIL_CODE_VERIFY)),
     mailer: Mailer = Depends(get_mailer),
 ) -> SendEmailCodeResponseSchema:

@@ -8,6 +8,7 @@ from server_main.settings import settings
 
 
 # TODO: add create_timestamp and rename timestamp -> update_timestamp
+# Maybe remove timestamp record at all?
 async def send_email_code_handler(
     redis_connection: redis.Redis,
     mailer: Mailer,
@@ -18,44 +19,40 @@ async def send_email_code_handler(
     """
     logger.info("Process send_message_handler...")
     code = generate_email_verification_code()
-    await mailer.immediatemail(data.email, "verify-email", {"code": code})
-    return True
-    # email_str = str(data.email)
-    # raw_attempts: str | None = await redis_connection.hget(email_str, "attempts")  # type: ignore
-    # attempts: int = 0
-    # if raw_attempts is not None:
-    #     attempts = int(raw_attempts)
-    #
-    # if attempts < settings.email_code_request_attempts_limit:
-    #     logger.info(f"set attempts to {attempts + 1} for {email_str}")
-    #     await redis_connection.hset(
-    #         email_str,
-    #         mapping={
-    #             "timestamp": get_utc_datetime_str(),
-    #             "code": code,
-    #             "attempts": attempts + 1,
-    #         },
-    #     )  # type: ignore
-    #
-    #     logger.info(
-    #         f"set redis write expiretime to {settings.email_code_expiretime} for {email_str}"
-    #     )
-    #     await redis_connection.expire(email_str, settings.email_code_expiretime)
-    #     await send_mail(
-    #         rabbitmq_connection,
-    #         email_str,
-    #         "verify-email.txt",
-    #         {"code": str(code)},
-    #     )
-    #     return True
-    #
-    # await redis_connection.hset(
-    #     email_str,
-    #     mapping={
-    #         "timestamp": get_utc_datetime_str(),
-    #         "code": code,
-    #         "attempts": attempts + 1,
-    #     },
-    # )  # type: ignore
-    # await redis_connection.expire(email_str, settings.email_code_expiretime)
-    # return False
+    email_str = str(data.email)
+
+    raw_attempts: str | None = await redis_connection.hget(email_str, "attempts")  # type: ignore
+    attempts: int = 0
+    if raw_attempts is not None:
+        attempts = int(raw_attempts)
+
+    if attempts < settings.email_code_request_attempts_limit:
+        attempts += 1
+        logger.info(f"Set attempts to {attempts} for {email_str}")
+        await redis_connection.hset(
+            email_str,
+            mapping={
+                "timestamp": get_utc_datetime_str(),
+                "code": code,
+                "attempts": attempts,
+            },
+        )  # type: ignore
+
+        logger.info(
+            f"Set redis record expiretime to {settings.email_code_expiretime} for {email_str}"
+        )
+        await redis_connection.expire(email_str, settings.email_code_expiretime)
+
+        await mailer.immediatemail(data.email, "verify-email", {"code": code})
+        return True
+
+    await redis_connection.hset(
+        email_str,
+        mapping={
+            "timestamp": get_utc_datetime_str(),
+            "code": code,
+            "attempts": attempts + 1,
+        },
+    )  # type: ignore
+    await redis_connection.expire(email_str, settings.email_code_expiretime)
+    return False
