@@ -1,5 +1,4 @@
 from fastapi import Depends
-from sqlalchemy.ext.asyncio import AsyncSession
 from redis.asyncio import Redis
 from server_main.web.integrations.redis import (
     RedisDB,

@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import Boolean, Column, DateTime, Integer, String, func
+from sqlalchemy import Boolean, Column, DateTime, String, func
 from sqlalchemy.dialects.postgresql import UUID
 from server_main.db.base import Base
 from server_main.settings import settings
@@ -9,7 +9,7 @@ class User(Base):
     """
     database User class.
 
-    :param id: At this moment we use just incemental way for ids.
+    :id: UUIDv4.
     :username: A name that is visible on the screen for example during a conversation.
     :nickname: A unique name that can be mentioned like in "Discord" FE: @boolmano.
     :access_token: The value that is used to identify the session.
