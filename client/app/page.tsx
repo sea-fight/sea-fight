@@ -4,7 +4,7 @@ import Button from "@/src/ui/Button";
 import useGameSearch from "@/src/utils/useGameSearch";
 
 export default function Home() {
-  const gameSearch = useGameSearch();
+  const gameSearch = useGameSearch((key) => {});
 
   return (
     <div className="flex h-screen justify-center items-center">
@@ -12,7 +12,7 @@ export default function Home() {
         loading={gameSearch.state === "searching"}
         onClick={() => gameSearch.triggerSearch()}
       >
-        {gameSearch.state === 'idle' ? 'Начать игру' : 'Прервать поиск'}
+        {gameSearch.state === "idle" ? "Начать игру" : "Прервать поиск"}
       </Button>
     </div>
   );
