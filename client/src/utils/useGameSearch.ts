@@ -5,26 +5,27 @@ import isValidGameQueueKey from "./isValidGameQueueKey";
 type State = "idle" | "searching";
 type WSState = "init" | "seen-ok" | "seen-gameKey";
 
-export default function useGameSearch(onGameKey: (value: string) => void) {
+export default function useGameSearch(onKey: (value: string) => void) {
   const [state, setState] = useState<State>("idle");
   const ws = useRef<WebSocket>();
   const wsState = useRef<WSState>("init");
-  const wsKey = useRef<string>();
+  const wsForceClosed = useRef(false);
 
   function triggerSearch() {
     switch (state) {
       case "idle":
-        ws.current = new WebSocket("/gameQueue");
+        ws.current = new WebSocket(
+          process.env.NEXT_PUBLIC_API_URL + "/gameQueue"
+        );
         ws.current.onopen = function () {
-          this.send("access_token");
+          this.send("<anonymous>");
         };
         ws.current.onclose = function () {
-          if (wsState.current === "seen-gameKey") {
-            // Connect to game
-          } else {
+          if (wsState.current !== "seen-gameKey" && !wsForceClosed.current) {
             toast("Соединение неожиданно закрылось", { type: "error" });
             setState("idle");
           }
+          wsForceClosed.current = false;
         };
         ws.current.onmessage = function ({ data }) {
           let isErr = false;
@@ -39,24 +40,24 @@ export default function useGameSearch(onGameKey: (value: string) => void) {
 
             case "seen-ok":
               if (isValidGameQueueKey(data)) {
-                wsKey.current = data;
                 wsState.current = "seen-gameKey";
                 ws.current?.close();
+                onKey(data);
               } else {
                 isErr = true;
               }
               break;
           }
           if (isErr) {
-            toast("Невалидный ответ от сервера");
+            toast("Невалидный ответ от сервера", { type: "error" });
             ws.current?.close();
-            setState("idle");
           }
         };
         setState("searching");
         break;
 
       case "searching":
+        wsForceClosed.current = true;
         ws.current?.close();
         setState("idle");
         break;

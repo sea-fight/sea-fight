@@ -17,7 +17,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
       <body className={inter.className}>
         <ToastContainer newestOnTop hideProgressBar />
         <Image
-          className="object-cover w-screen h-screen -z-10 fixed"
+          className="object-cover h-screen w-screen -z-10 fixed"
           src={bg}
           alt=""
         />

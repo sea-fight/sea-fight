@@ -1,17 +1,13 @@
 services:
-  rabbitmq:
-    image: rabbitmq:alpine
+  client:
+    build:
+      context: ./client
+      args:
+        NEXT_PUBLIC_API_URL: server-main:8000
+    restart: always
     ports:
-      - '15672:15672'
-      - '5672:5672'
-  # server-main:
-  #   build:
-  #     context: ./server-main
-  #   restart: always
-  #   ports:
-  #     - "8000:8000"
-    env_file:
-      - .server-main.env
+      - "3000:3000"
+
   server-mailer:
     build:
       context: ./server-mailer
@@ -28,7 +24,7 @@ services:
   server-main:
     build:
       context: ./server-main
-    command: ["uvicorn", "server_main.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    command: [ "uvicorn", "server_main.main:app", "--host", "0.0.0.0", "--port", "8000" ]
     # volumes:
     #   - .:/server-main
     ports:
@@ -42,6 +38,14 @@ services:
       - db
       - redis
       - server-mailer
+
+  rabbitmq:
+    image: rabbitmq:alpine
+    ports:
+      - '15672:15672'
+      - '5672:5672'
+    env_file:
+      - .server-main.env
 
   db:
     image: postgres:13
@@ -66,7 +70,6 @@ services:
       # - The ${variable:?message} syntax causes shell to exit with a non-zero
       #   code and print a message, when the variable is not set or empty
       - redis-server --requirepass "$${REDIS_PASSWORD:?REDIS_PASSWORD variable is not set}"
-
 
 volumes:
   postgres_data:

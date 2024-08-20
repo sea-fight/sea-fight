@@ -2,9 +2,11 @@
 
 import Button from "@/src/ui/Button";
 import useGameSearch from "@/src/utils/useGameSearch";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
-  const gameSearch = useGameSearch((key) => {});
+  const router = useRouter();
+  const gameSearch = useGameSearch((key) => router.push("/game?key=" + key));
 
   return (
     <div className="flex h-screen justify-center items-center">
