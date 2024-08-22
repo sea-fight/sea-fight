@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { PropsWithChildren } from "react";
-import Image from "next/image";
-import bg from "@/src/assets/sitebg.svg";
 import { ToastContainer } from "react-toastify";
+import Image from "next/image";
+import bg from "@/src/assets/sitebg.png";
 import "react-toastify/dist/ReactToastify.css";
 import "./globals.css";
 

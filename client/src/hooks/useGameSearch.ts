@@ -1,8 +1,8 @@
 import { useRef, useState } from "react";
 import { toast } from "react-toastify";
-import isValidGameQueueKey from "./isValidGameQueueKey";
+import isValidGameQueueKey from "../utils/isValidGameQueueKey";
 
-type State = "idle" | "searching";
+export type State = "idle" | "searching";
 type WSState = "init" | "seen-ok" | "seen-gameKey";
 
 export default function useGameSearch(onKey: (value: string) => void) {

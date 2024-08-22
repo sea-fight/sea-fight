@@ -1,10 +1,10 @@
 "use client";
 
 import Button from "@/src/ui/Button";
-import useGameSearch from "@/src/utils/useGameSearch";
+import useGameSearch from "@/src/hooks/mock/useGameSearchMock";
 import { useRouter } from "next/navigation";
 
-export default function Home() {
+export default function Page() {
   const router = useRouter();
   const gameSearch = useGameSearch((key) => router.push("/game?key=" + key));
 
