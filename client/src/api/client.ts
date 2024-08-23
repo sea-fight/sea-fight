@@ -1,21 +1,25 @@
 import axios from "axios";
-import tokenStore from "./tokenStore";
 import { INVALID_ACCESS_TOKEN } from "./errorCodes";
-import refreshToken from "./endpoints/refreshToken";
+import tokenStore from "./tokenStore";
+import reissueToken from "./endpoints/auth/reissue";
 
 let __promise = Promise.resolve();
 let __isProcessing = false;
 
-function doRefreshToken() {
+const doRefreshToken = () => {
   if (__isProcessing) {
     return __promise;
   } else {
     const { promise, resolve, reject } = Promise.withResolvers<void>();
     __promise = promise;
     __isProcessing = true;
-    refreshToken().then(() => (resolve(), (__isProcessing = false)), reject);
+    reissueToken().then(token => {
+      tokenStore.setToken(token)
+      resolve();
+      __isProcessing = false;
+    }, reject);
   }
-}
+};
 
 const client = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -35,10 +39,8 @@ client.interceptors.response.use(async (response) => {
       case INVALID_ACCESS_TOKEN:
         await doRefreshToken();
         return client(response.config);
-
-      default:
-        throw Error("Request failed: " + response.data.code);
     }
+    return Promise.reject(response);
   }
   return response;
 });

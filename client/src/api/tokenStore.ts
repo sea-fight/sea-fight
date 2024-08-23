@@ -1,14 +1,14 @@
 import { makeAutoObservable } from "mobx";
 
 class TokenStore {
-  private value?: string;
+  private value: string | null = null;
 
   constructor() {
     makeAutoObservable(this);
   }
 
   hasToken() {
-    return this.value !== undefined;
+    return this.value !== null;
   }
 
   getToken() {
@@ -22,4 +22,4 @@ class TokenStore {
 
 const tokenStore = new TokenStore();
 
-export default tokenStore;
+export default tokenStore

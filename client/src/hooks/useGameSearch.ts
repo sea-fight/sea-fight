@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { toast } from "react-toastify";
 import isValidGameQueueKey from "../utils/isValidGameQueueKey";
+import tokenStore from "../api/tokenStore";
 
 export type State = "idle" | "searching";
 type WSState = "init" | "seen-ok" | "seen-gameKey";
@@ -18,7 +19,7 @@ export default function useGameSearch(onKey: (value: string) => void) {
           process.env.NEXT_PUBLIC_API_URL + "/gameQueue"
         );
         ws.current.onopen = function () {
-          this.send("<anonymous>");
+          this.send(tokenStore.getToken()!);
         };
         ws.current.onclose = function () {
           if (wsState.current !== "seen-gameKey" && !wsForceClosed.current) {

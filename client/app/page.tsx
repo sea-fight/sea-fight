@@ -1,7 +1,7 @@
 "use client";
 
 import Button from "@/src/ui/Button";
-import useGameSearch from "@/src/hooks/mock/useGameSearchMock";
+import useGameSearch from "@/src/hooks/useGameSearch";
 import { useRouter } from "next/navigation";
 
 export default function Page() {
