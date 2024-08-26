@@ -1,23 +1,36 @@
-import {
-  ButtonHTMLAttributes,
-  DetailedHTMLProps,
-  PropsWithChildren,
-} from "react";
 import styled, { css } from "styled-components";
 
-const RawButton = styled.button<{ $loading: boolean }>`
-  padding: 1.25rem 2rem;
+const Button = styled.button<{
+  loading?: boolean;
+  disabled?: boolean;
+  size: "small" | "big";
+}>`
+  ${(props) =>
+    props.size === "small"
+      ? css`
+          padding: 0.625rem 1rem;
+        `
+      : css`
+          padding: 1.25rem 2rem;
+        `}
   border-radius: 10px;
-  background-color: white;
   position: relative;
   transition: box-shadow 0.1s linear;
 
-  &:hover {
-    box-shadow: 0 0 5px 5px #ffffff55;
-  }
+  ${(props) =>
+    props.disabled
+      ? css`
+          background-color: grey;
+        `
+      : css`
+          background-color: white;
+          &:hover {
+            box-shadow: 0 0 5px 5px #ffffff55;
+          }
+        `}
 
   ${(props) =>
-    props.$loading &&
+    props.loading &&
     css`
       &::after,
       &::before {
@@ -65,17 +78,4 @@ const RawButton = styled.button<{ $loading: boolean }>`
     `}
 `;
 
-export default function Button({
-  children,
-  loading,
-  onClick,
-}: PropsWithChildren<{
-  loading?: boolean;
-  onClick?: () => void;
-}>) {
-  return (
-    <RawButton $loading={!!loading} onClick={onClick}>
-      {children}
-    </RawButton>
-  );
-}
+export default Button;

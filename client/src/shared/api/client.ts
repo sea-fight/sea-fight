@@ -2,27 +2,26 @@ import axios from "axios";
 import { INVALID_ACCESS_TOKEN } from "./errorCodes";
 import tokenStore from "./tokenStore";
 import reissueToken from "./endpoints/auth/reissue";
+import signUpAnonymous from "./endpoints/auth/sign-up/anon";
 
 let __promise = Promise.resolve();
 let __isProcessing = false;
 
-const doRefreshToken = () => {
-  if (__isProcessing) {
-    return __promise;
-  } else {
-    const { promise, resolve, reject } = Promise.withResolvers<void>();
-    __promise = promise;
+async function doRefreshToken() {
+  if (!__isProcessing) {
     __isProcessing = true;
-    reissueToken().then(token => {
-      tokenStore.setToken(token)
-      resolve();
-      __isProcessing = false;
-    }, reject);
+    __promise = reissueToken()
+      .catch(signUpAnonymous)
+      .then((token) => {
+        tokenStore.setToken(token);
+        __isProcessing = false;
+      });
   }
-};
+  return __promise;
+}
 
 const client = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: import.meta.env.VITE_API_URL,
   withCredentials: true,
 });
 
