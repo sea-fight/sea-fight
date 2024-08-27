@@ -1293,6 +1293,17 @@ hiredis = ["hiredis (>=1.0.0)"]
 ocsp = ["cryptography (>=36.0.1)", "pyopenssl (==20.0.1)", "requests (>=2.26.0)"]
 
 [[package]]
+name = "result"
+version = "0.17.0"
+description = "A Rust-like result type for Python"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "result-0.17.0-py3-none-any.whl", hash = "sha256:49fd668b4951ad15800b8ccefd98b6b94effc789607e19c65064b775570933e8"},
+    {file = "result-0.17.0.tar.gz", hash = "sha256:b73da420c0cb1a3bf741dbd41ff96dedafaad6a1b3ef437a9e33e380bb0d91cf"},
+]
+
+[[package]]
 name = "rich"
 version = "13.7.1"
 description = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
@@ -1821,4 +1832,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "f857374b06de84f5e507920b25500806e481688c8abd7f8af4c466cdea2672aa"
+content-hash = "d17e00fb3d2c5c9700217d2394bab40d9395723fce7aa1a553604651954bb9be"

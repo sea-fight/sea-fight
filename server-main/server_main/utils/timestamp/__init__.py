@@ -48,3 +48,6 @@ def convert_str_to_datetime(
     local_dt = datetime.strptime(date_str, date_format)
     utc_dt = local_dt.replace(tzinfo=timezone.utc)
     return utc_dt
+
+
+__all__ = ["convert_str_to_datetime", "get_utc_datetime"]

@@ -1,5 +1,4 @@
 from contextlib import asynccontextmanager
-import aio_pika
 from fastapi import Request
 from fastapi.responses import JSONResponse
 from .web.api import router
@@ -9,6 +8,8 @@ from .web.integrations.services import Mailer
 from .db.base import db_session
 from .settings import settings
 from .enhanced import AppCtx, EnhancedApp, EnhancedHTTPException
+
+# TODO: delete user endpoint for dev purposes
 
 
 @asynccontextmanager

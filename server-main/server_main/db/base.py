@@ -1,11 +1,11 @@
 from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncAttrs
 
 from server_main.settings import settings
 from .meta import metadata
 
 
-class Base(DeclarativeBase):
+class Base(AsyncAttrs, DeclarativeBase):
     """Base for all models."""
 
     metadata = metadata

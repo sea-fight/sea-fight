@@ -19,6 +19,7 @@ asyncpg = "^0.29.0"
 loguru = "^0.7.2"
 redis = {extras = ["hiredis"], version = "^5.0.7"}
 aio-pika = "^9.4.2"
+result = "^0.17.0"
 
 
 [build-system]

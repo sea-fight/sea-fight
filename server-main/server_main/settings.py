@@ -27,13 +27,10 @@ class Settings(BaseSettings):
     rabbitmq_url: str = required_env("RABBITMQ_URL")
     rabbitmq_mailer_queue: str = required_env("RABBITMQ_MAILER_QUEUE")
 
+    fingerprint_max_length: int = 1024
     username_max_length: int = 32
     username_min_length: int = 4
-    nickname_max_length: int = 32
-    nickname_min_length: int = 4
     email_max_length: int = 256
-    password_min_length: int = 4
-
     email_code_length: int = 8
     email_code_expiretime: int = 3600  # in seconds
     email_code_request_attempts_limit: int = 69

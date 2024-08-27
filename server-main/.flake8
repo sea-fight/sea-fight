@@ -8,6 +8,8 @@ docstring_style=sphinx
 ignore =
   ; Found `f` string
   WPS305,
+  ; multiple statements on one line (def)
+  E704,
   ; multiple statements on one line
   E701,
   ; Complex functions
